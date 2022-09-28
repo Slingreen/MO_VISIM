@@ -65,6 +65,7 @@ compile_commands.json
 *.mtl
 *.Debug
 *.Release
+/build
 
 # MacOS spam
 .DS_Store
