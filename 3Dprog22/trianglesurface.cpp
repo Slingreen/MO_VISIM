@@ -18,8 +18,8 @@ TriangleSurface::TriangleSurface() : VisualObject()
 
 TriangleSurface::TriangleSurface(std::string filnavn) : VisualObject()
 {
-   readFileI(filnavn);
-   mMatrix.setToIdentity();
+    readFileI(filnavn);
+    mMatrix.setToIdentity();
 }
 
 TriangleSurface::~TriangleSurface()
@@ -65,6 +65,76 @@ void TriangleSurface::readFileI(std::string filnavn)
              mIndices.push_back(indice);
         }
         inn >> n;
+        inn.close();
+    }
+}
+
+void TriangleSurface::readFileLAS(std::string filnavn)
+{
+    std::ifstream inn;
+    inn.open(filnavn.c_str());
+
+    if (inn.is_open()) {
+        int n;
+        float x, y, z;
+        Vertex vertex;
+        inn >> n;
+
+        for (int i = 0; i < n; i++){
+            inn >> vertex;
+
+            x = vertex.GetX();
+            y = vertex.GetY();
+            z = vertex.GetZ();
+
+
+            QVector3D temp{x, y, z};
+            point.push_back(temp);
+        }
+
+        float xMin, xMax, yMin, yMax;
+        xMin = point[0].x();
+        xMax = point[0].x();
+        yMin = point[0].y();
+        yMax = point[0].y();
+        for (int i = 0; i < point.size(); i++){
+            if (point[i].x() > xMax)
+            {
+                xMax = point[i].x();
+            }
+            if (point[i].x() < xMin)
+            {
+                xMin = point[i].x();
+            }
+            if (point[i].y() > yMax)
+            {
+                yMax = point[i].y();
+            }
+            if (point[i].y() < yMin)
+            {
+                yMin = point[i].y();
+            }
+        }
+
+        float lengthofsquare{5};
+        z = 0;
+        for (float i = xMin; i < xMax; i+=lengthofsquare){
+            for (float j = yMin; j < yMax; j+=lengthofsquare){
+                for (int a = 0; a < point.size(); a++){
+                    if (point[a].x() == i && point[i].y() == j){
+                        Vertex xyzrgbuv(i,point[a].z(),j, 1,1,1, 1,0);
+                        mVertices.push_back(xyzrgbuv);
+                    }else if ((point[a].x() > i && point[a].x() <= i + lengthofsquare) && (point[a].y() > j && point[a].y() <= j + lengthofsquare)){
+                        if (z < point[a].z()){
+                            z = point[a].z(); //har valg å bruke det laveste punktet
+                        }
+                    }
+                }
+                Vertex xyzrgbuv(i/2,z,j/2, 1,1,1, 1,0);
+                mVertices.push_back(xyzrgbuv);
+            }
+        }
+
         inn.close();
     }
 }

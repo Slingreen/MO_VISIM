@@ -15,6 +15,7 @@ public:
    ~TriangleSurface() override;
    void readFile(std::string filnavn);
    void readFileI(std::string filnavn);
+   void readFileLAS(std::string filnavn);
    void writeFile(std::string filnavn);
    void writeFileI(std::string filnavn);
    void init(GLint shader) override;
@@ -26,6 +27,8 @@ public:
 
 private:
    int n;
+   std::vector <QVector3D> point;
+   std::vector <std::vector<float>> surface;
 };
 
 

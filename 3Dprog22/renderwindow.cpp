@@ -190,7 +190,7 @@ void RenderWindow::init()
 //    mObjects.push_back(ny = new TextureTriangle());
 //    ny->setName("Teset");
 //    ny->init();
-    mObjects.push_back(ny = new TriangleSurface("../3Dprog22/formE4.txt"));
+    mObjects.push_back(ny = new TriangleSurface("../3Dprog22/formE4.txt")); //namdal,formE4
     ny->setName("form");
     ny->init();
     mObjects.push_back(ny = new RollingBall(3,mObjects[1]));
