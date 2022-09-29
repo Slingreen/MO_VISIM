@@ -32,6 +32,9 @@
 #include "quad.h"
 
 #include "modelobject.h"
+
+#include "bspline.h"
+
 RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     : mContext(nullptr), mInitialized(false), mMainWindow(mainWindow)
 
@@ -207,22 +210,22 @@ void RenderWindow::init()
     }
 
     //  QuadTre
-    gsml::Point2D a{-16, -16}, b{16, -16}, c{16, 16}, d{-16, 16}; // må gjøres ordentlig // 32x32(-16 -> 16)
-    mQuadTre.init(a, b, c, d);
-    mQuadTre.subDivide(1);
-    auto subtre = mQuadTre.find(gsml::Point2D(13,13));  //16x16(0 -> 16)
-    subtre->subDivide(1);
-    subtre = mQuadTre.find(gsml::Point2D(13,13));       //8x8(8 -> 16)
-    subtre->subDivide(1);
-    subtre = mQuadTre.find(gsml::Point2D(13,13));       //4x4(12 -> 16)
-    subtre->subDivide(1);
-    subtre = mQuadTre.find(gsml::Point2D(13,13));       //2x2(12 -> 14)
-    subtre->subDivide(1);
+//    gsml::Point2D a{-16, -16}, b{16, -16}, c{16, 16}, d{-16, 16}; // må gjøres ordentlig // 32x32(-16 -> 16)
+//    mQuadTre.init(a, b, c, d);
+//    mQuadTre.subDivide(1);
+//    auto subtre = mQuadTre.find(gsml::Point2D(13,13));  //16x16(0 -> 16)
+//    subtre->subDivide(1);
+//    subtre = mQuadTre.find(gsml::Point2D(13,13));       //8x8(8 -> 16)
+//    subtre->subDivide(1);
+//    subtre = mQuadTre.find(gsml::Point2D(13,13));       //4x4(12 -> 16)
+//    subtre->subDivide(1);
+//    subtre = mQuadTre.find(gsml::Point2D(13,13));       //2x2(12 -> 14)
+//    subtre->subDivide(1);
 
-    for (auto it=mObjects.begin(); it!=mObjects.end(); it++)
-    {
-        mQuadTre.insert((*it)->getPosition2D(), (*it)->getName(), *it);  // bør ha et navn
-    }
+//    for (auto it=mObjects.begin(); it!=mObjects.end(); it++)
+//    {
+//        mQuadTre.insert((*it)->getPosition2D(), (*it)->getName(), *it);  // bør ha et navn
+//    }
 
     //********************** Camera Setup **********************
     mCurrentCamera = new Camera();
@@ -778,17 +781,17 @@ void RenderWindow::mouseMoveEvent(QMouseEvent *event)
 
 
 void RenderWindow::ColCheck(){
-    auto posisjon = mMap["Player"]->getPosition2D();
-    auto subtre = mQuadTre.find(posisjon);
-    for (auto it = subtre->begin(); it != subtre->end(); it ++)
-    {
-        for (int i = 0; i<4; i++){
-            std::string temp = "Trophy ";
-            temp += std::to_string(i+1);
-            if((*it)->getName() == temp)
-            {
-                (*it)->collision();
-            }
-        }
-    }
+//    auto posisjon = mMap["Player"]->getPosition2D();
+//    auto subtre = mQuadTre.find(posisjon);
+//    for (auto it = subtre->begin(); it != subtre->end(); it ++)
+//    {
+//        for (int i = 0; i<4; i++){
+//            std::string temp = "Trophy ";
+//            temp += std::to_string(i+1);
+//            if((*it)->getName() == temp)
+//            {
+//                (*it)->collision();
+//            }
+//        }
+//    }
 }

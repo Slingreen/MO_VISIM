@@ -69,7 +69,7 @@ private:
     //********************** Object stuff: **********************
     std::vector<VisualObject*> mObjects;
     std::unordered_map<std::string, VisualObject*> mMap;
-    gsml::QuadTre<std::string, VisualObject*> mQuadTre;
+    //gsml::QuadTre<std::string, VisualObject*> mQuadTre;
 
     //VisualObject* iob;
     VisualObject* ny;

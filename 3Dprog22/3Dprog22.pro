@@ -8,6 +8,7 @@ TARGET      = 3D-programmering
 SOURCES += main.cpp \
     TQuadtre.cpp \
     beziercurve.cpp \
+    bspline.cpp \
     camera.cpp \
     interactiveobject.cpp \
     logger.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     Input.h \
     TQuadtre.h \
     beziercurve.h \
+    bspline.h \
     camera.h \
     interactiveobject.h \
     logger.h \

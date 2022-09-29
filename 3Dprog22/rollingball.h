@@ -3,12 +3,14 @@
 
 #include "octahedronball.h"
 #include "trianglesurface.h"
+//#include "bspline.h"
 
 class RollingBall : public OctahedronBall
 {
 public:
     RollingBall(int n);
     RollingBall(int n, VisualObject* surface);
+//    RollingBall(int n, VisualObject* surface, bSpline *s);
     ~RollingBall() override;
     void init(GLint matrixUniform) override;
     void init() override;
@@ -16,7 +18,8 @@ public:
     void move(float dt) override;
 //    void setSurface(VisualObject* surface) { triangle_surface = surface; }
 protected:
-    VisualObject* triangle_surface;
+    VisualObject* triangle_surface{nullptr};
+//    bSpline* spline{nullptr};
 private:
     void UpdateNormal();
     Vec3 old_normal{0.0, 1.0, 0.0};
@@ -29,5 +32,7 @@ private:
     float y{15};
     float oy{15};
     float r{0.5};
+
+    bool onTriangle{false};
 };
 #endif // ROLLINGBALL_H
