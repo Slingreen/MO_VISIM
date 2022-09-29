@@ -20,6 +20,7 @@ public:
    virtual void move(float dt) {};
 
    std::pair<float, float> getPosition2D();
+   QVector3D getPosition3D();
    void setName(std::string name);
    std::string getName() const;
 

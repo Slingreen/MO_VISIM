@@ -16,15 +16,16 @@ public:
     void move(float dt) override;
 
 protected:
-    //VisualObject* ball{nullptr};
+    VisualObject* ball{nullptr};
 private:
     int findKnoteIntervall(float x);
     QVector3D evaluateBSpline (float x);
     static const int d = 2;
     static const int n = 5;
-    float t[d+n+1];
-    //float t[d+n+1]{0.f,0.f,0.f,1.f,2.f,3.f,3.f,3.f};
+    float t[d+n+1]{0.f,0.f,0.f,1.f,2.f,3.f,3.f,3.f};
     std::vector<QVector3D> c;
+    float ti{0.001f};
+    bool make{false};
 };
 
 #endif // BSPLINE_H

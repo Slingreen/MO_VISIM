@@ -199,6 +199,9 @@ void RenderWindow::init()
     mObjects.push_back(ny = new RollingBall(3,mObjects[1]));
     ny->setName("ball");
     ny->init();
+    mObjects.push_back(ny = new bSpline(mObjects[2]));
+    ny->setName("spline");
+    ny->init();
 //    ny->mMatrix.translate(0.2f,  10.0f,  1.5f);
 
 
@@ -286,6 +289,7 @@ void RenderWindow::render()
     float deltaTime = elapsed_time.count();
     qDebug() << elapsed_time.count();
     mObjects[2]->move(deltaTime/1000);
+    mObjects[3]->move(deltaTime/1000);
     /*
     //what shader to use
     glUseProgram(mShaderProgram[0]->getProgram() );
