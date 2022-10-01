@@ -11,6 +11,7 @@ SOURCES += main.cpp \
     bspline.cpp \
     camera.cpp \
     interactiveobject.cpp \
+    lasmap.cpp \
     logger.cpp \
     mainwindow.cpp \
     modelobject.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     bspline.h \
     camera.h \
     interactiveobject.h \
+    lasmap.h \
     logger.h \
     mainwindow.h \
     modelobject.h \
