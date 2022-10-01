@@ -90,7 +90,7 @@ void lasmap::draw()
     glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
 //    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0)); //GL_POINTS, GL_TRIANGLES
-    glDrawArrays(GL_TRIANGLES, 0, mVertices.size());
+    glDrawArrays(GL_POINTS, 0, mVertices.size());
 }
 
 void lasmap::readFile(std::string filnavn)
@@ -110,13 +110,13 @@ void lasmap::readFile(std::string filnavn)
 
              Points.push_back(QVector3D (x,y,z));
 
-             //vertex = Vertex(x - 659428, z - 59, y - 7153117, 1, 1, 1, 0, 1);
+             vertex = Vertex(x - 659428, z - 59, y - 7153117, 1, 1, 1, 0, 1);
 
-             //mVertices.push_back(vertex);
+             mVertices.push_back(vertex);
         }
         inn >> n;
         inn.close();
-    }
+    }/*
 
     float xMax = Points[0].x(), xMin= Points[0].x(), yMax= Points[0].y(), yMin = Points[0].y();
     for (int i = 0; i < Points.size(); i++){
@@ -348,7 +348,7 @@ void lasmap::readFile(std::string filnavn)
                 index++;
             //}
         }
-    }/**/
+    }/*
     float k = new_Points.size();
     float g = Surface.size();
     for (int i = 0; i < new_Points.size(); i++){
