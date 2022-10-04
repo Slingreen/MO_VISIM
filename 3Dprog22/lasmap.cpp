@@ -90,7 +90,7 @@ void lasmap::draw()
     glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
 //    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0)); //GL_POINTS, GL_TRIANGLES
-    glDrawArrays(GL_POINTS, 0, mVertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, mVertices.size());
 }
 
 void lasmap::readFile(std::string filnavn)
@@ -110,15 +110,15 @@ void lasmap::readFile(std::string filnavn)
 
              Points.push_back(QVector3D (x,y,z));
 
-             vertex = Vertex(x - 659428, z - 59, y - 7153117, 1, 1, 1, 0, 1);
+             //vertex = Vertex(x - 659428, z - 59, y - 7153117, 1, 1, 1, 0, 1);
 
-             mVertices.push_back(vertex);
+             //mVertices.push_back(vertex);
         }
         inn >> n;
         inn.close();
-    }/*
+    }
 
-    float xMax = Points[0].x(), xMin= Points[0].x(), yMax= Points[0].y(), yMin = Points[0].y();
+    float xMax = Points[0].x(), xMin = Points[0].x(), yMax = Points[0].y(), yMin = Points[0].y(), zMin = Points[0].z();
     for (int i = 0; i < Points.size(); i++){
         if (Points[i].x() < xMin){
             xMin = Points[i].x();
@@ -132,240 +132,179 @@ void lasmap::readFile(std::string filnavn)
         if (Points[i].y() > yMax){
             yMax = Points[i].y();
         }
+        if (zMin > Points[i].z()){
+            zMin = Points[i].z();
+        }
     }
 
-    float ekvidistanse{5};
-    float t = xMax - xMin;
-    if ((int)t % (int)ekvidistanse != 0){
-        int sav = (int)t % (int)ekvidistanse;
-        sav += 1;
-        t = sav * ekvidistanse;
-        xMax = t + xMin;
+    const int ekvidistanse{1};
+
+    float last_height{0};
+    int loopnr{1};
+    for (float yy = yMin; yy < yMax; yy += ekvidistanse){
+        for (float xx = xMin; xx < xMax; xx += ekvidistanse){
+            Reduce_Points(xx, yy, zMin, ekvidistanse, &last_height, xMin, yMin, &loopnr, xMax);
+        }
     }
-    t = yMax - yMin;
-    if ((int)t % (int)ekvidistanse != 0){
-        int sav = (int)t % (int)ekvidistanse;
-        sav += 1;
-        t = sav * ekvidistanse;
-        yMax = t + yMin;
+/*
+    for (int i = 0; i < new_Points.size(); i++){
+        Vertex r(new_Points[i].x(), new_Points[i].y(), new_Points[i].z(), 1, 1, 1, 0, 1);
+        mVertices.push_back(r);
     }
-    int index{0};
-    for (auto xx = xMin; xx < xMax; xx += ekvidistanse){
-        for (auto yy = yMin; yy < yMax; yy += ekvidistanse){
-            int count{0}; //for the avrage
-            float sum{0}; //for the avrage
-            for (int i = 0; i < Points.size(); i++){
-                if (Points[i].x() == xx && Points[i].y() == yy){
-                    new_Points.push_back(QVector3D((xx - xMin), Points[i].z(), (yy - yMin)));
-                }
-                if (Points[i].x() == xx + ekvidistanse && Points[i].y() == yy){
-                    new_Points.push_back(QVector3D(((xx + ekvidistanse) - xMin), Points[i].z(), (yy - yMin)));
-                }
-                if (Points[i].x() == xx && Points[i].y() == yy + ekvidistanse){
-                    new_Points.push_back(QVector3D((xx - xMin), Points[i].z(), ((yy + ekvidistanse) - yMin)));
-                }
-                if (Points[i].x() == xx + ekvidistanse && Points[i].y() == yy + ekvidistanse){
-                    new_Points.push_back(QVector3D(((xx + ekvidistanse) - xMin), Points[i].z(), ((yy + ekvidistanse) - yMin)));
-                }
-                if ((Points[i].x() >= xx && Points[i].x() <= xx + ekvidistanse) && (Points[i].y() >= yy && Points[i].y() <= yy + ekvidistanse)){
-                    count++;
-                    sum += Points[i].z();
+    writeFile("newPoints.txt");/**/
+
+    int l = Points.size();
+    int k = new_Points.size();
+    int id{0};
+    int square{1};
+    int maxsquares{1};
+    int maxrows{1};
+    for (int i = 0; i < new_Points.size(); i++){
+        if (new_Points[i].x() == 0){
+            maxsquares++;
+        }
+        if (new_Points[i].z() == 0){
+            maxrows++;
+        }
+    }
+    int maxTriangles = maxsquares * 2;
+    int row{1};
+    for (int dz = 0; dz < yMax - yMin; dz += ekvidistanse){
+        for (int dx = 0; dx < xMax - xMin; dx += ekvidistanse){
+            int A{0}, B{0}, C{0}, D{0};
+
+            for (int i = 0; i < new_Points.size(); i++){
+                int ax = new_Points[i].x();
+                int bx = new_Points[i].z();
+
+                if (new_Points[i].x() == dx && new_Points[i].z() == dz){//dosen't trigger?
+                    A = i;
+                }else if (new_Points[i].x() == dx + ekvidistanse && new_Points[i].z() == dz){//dosen't trigger?
+                    B = i;
+                }else if (new_Points[i].x() == dx && new_Points[i].z() == dz + ekvidistanse){//dosen't trigger?
+                    C = i;
+                }else if (new_Points[i].x() == dx + ekvidistanse && new_Points[i].z() == dz + ekvidistanse){//dosen't trigger?
+                    D = i;
                 }
             }
-            new_Points.push_back(QVector3D(((xx + ekvidistanse) - xMin)/2, sum/count, ((yy + ekvidistanse) - yMin)/2));
 
-            //std::vector <std::vector <int>> temp;
-            int b{0}, a{0}, c{0}, d{0}, id{0}, A{0}, B{0}, C{0}, D{0};
-            b = (xMax/ekvidistanse) * 4;
-            d = b;
-            //for (int i = 0; i < new_Points.size(); i += 5){
-                if (xx == xMin && yy == yMin){
-                    //for (int j = 0; j < 4; j++){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, -1});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, -1});
-                    id++;
-                    //}
+            switch (square){
+            case 1:
+                Surface.push_back({ A, B, C, id + 1, -1, -1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                id++;
+                square++;
+                break;
+            case 2:
+                Surface.push_back({ A, B, C, id + 1, id - 1, -1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                id++;
+                if (((maxTriangles * row) - 1) - id == 2){
+                    square++;
                 }
-                else if ((xx > xMin && xx + ekvidistanse < xMax) && yy == yMin){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, -1});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
+                break;
+            case 3:
+                Surface.push_back({ A, B, C, id + 1, id - 1, -1});
+                id++;
+                Surface.push_back({ C, B, D, -1, id + maxTriangles - 1, id - 1});
+                id++;
+                square++;
+                break;
+            case 4:
+                Surface.push_back({ A, B, C, id + 1, -1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                id++;
+                square++;
+                break;
+            case 5:
+                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                id++;
+                if (((maxTriangles * row) - 1) - id == 2){
+                    square++;
                 }
-                else if(xx + ekvidistanse == xMax && yy == yMin){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, -1});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, -1});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
+                break;
+            case 6:
+                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, -1, id + maxTriangles - 1, id - 1});
+                id++;
+                if (row == maxrows - 1){
+                    square++;
+                }else{
+                    square -= 2;
                 }
-                else if(xx == xMin && (yy > yMin && yy + ekvidistanse < yMax)){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, -1});
-                    id++;
+                break;
+            case 7:
+                Surface.push_back({ A, B, C, id + 1, -1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, -1, id - 1});
+                id++;
+                square++;
+                break;
+            case 8:
+                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, id + 1, -1, id - 1});
+                id++;
+                if (((maxTriangles * row) - 1) - id == 2){
+                    square++;
                 }
-                else if(xx + ekvidistanse == xMax && (yy > yMin && yy + ekvidistanse < yMax)){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, -1});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
-                }
-                else if(xx == xMin && yy + ekvidistanse == yMax){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, -1});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, -1});
-                    id++;
-                }
-                else if((xx > xMin && xx + ekvidistanse < xMax) && yy + ekvidistanse == yMax){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, -1});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
-                }
-                else if (xx + ekvidistanse == xMax && yy + ekvidistanse == yMax){
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, -1});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, -1});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
-                }
-                else {
-                    A = id;
-                    B = A + 1;
-                    C = B + 1;
-                    D = C + 1;
-                    d -= A;
-                    d += 2;
-                    Surface.push_back({id, index, index + 1, index + 4, A, D, d});
-                    b += id;
-                    id++;
-                    a = id + 6;
-                    Surface.push_back({id, index + 1, index + 2, index + 4, C, A, a});
-                    id++;
-                    Surface.push_back({id, index + 2, index + 3, index + 4, D, B, b});
-                    id++;
-                    c = id - 6;
-                    Surface.push_back({id, index + 3, index, index + 4, A, C, c});
-                    id++;
-                }
-                index++;
-            //}
+                break;
+            case 9:
+                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                id++;
+                Surface.push_back({ C, B, D, -1, -1, id - 1});
+                id++;
+                break;
+            }
         }
-    }/*
-    float k = new_Points.size();
-    float g = Surface.size();
-    for (int i = 0; i < new_Points.size(); i++){
-        Vertex p(new_Points[i].x(), new_Points[i].y(), new_Points[i].z(), 1, 1, 1, 1, 0);
-        mVertices.push_back(p);
+        row++;
     }
-    /*for (int i = 0; i < Surface.size(); i++){
-        float ix = Surface[i][1];
-        float iy = Surface[i][2];
-        float iz = Surface[i][3];
+    float g = Surface.size();
 
-        Vertex p(new_Points[ix].x(), new_Points[ix].y(), new_Points[ix].z(), 1, 1, 1, 1, 0);
-        Vertex p1(new_Points[iy].x(), new_Points[iy].y(), new_Points[iy].z(), 1, 1, 1, 1, 0);
-        Vertex p2(new_Points[iz].x(), new_Points[iz].y(), new_Points[iz].z(), 1, 1, 1, 1, 0);
+    for (int i = 0; i < Surface.size(); i++){
+        int A = Surface[i][0];
+        int B = Surface[i][1];
+        int C = Surface[i][2];
+
+        Vertex p(new_Points[A].x(), new_Points[A].y(), new_Points[A].z(), 1, 1, 1, 0, 1);
+        Vertex p1(new_Points[B].x(), new_Points[B].y(), new_Points[B].z(), 1, 1, 1, 0, 1);
+        Vertex p2(new_Points[C].x(), new_Points[C].y(), new_Points[C].z(), 1, 1, 1, 0, 1);
 
         mVertices.push_back(p);
         mVertices.push_back(p1);
         mVertices.push_back(p2);
-    }*/
+    }/**/
+}
+
+void lasmap::Reduce_Points(float x, float y, float zMin, int e, float* lasth, float xMin, float yMin, int* loop, float xMax){
+    int count{0};
+    float sum{0};
+
+    for (int i = 0; i < Points.size(); i++){
+        if ((Points[i].x() >= x && Points[i].x() < x + e) && (Points[i].y() >= y && Points[i].y() < y + e)){
+            sum += Points[i].z() - zMin;
+            count++;
+        }
+    }
+    if (count >= 1){
+        *lasth += sum/count;
+        int read_loop = *loop;
+        new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin)); //fix for y values
+        *loop = 1;
+        *lasth = 0;
+    }else if (!(x + e >= xMax)){
+        Reduce_Points(x + e, y + e, zMin, e, lasth, xMin, yMin, loop++, xMax); //fix y values
+    }else{
+        *lasth += sum/count;
+        int read_loop = *loop;
+        new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin)); //fix y values
+        *loop = 1;
+        *lasth = 0;
+    }
 }
