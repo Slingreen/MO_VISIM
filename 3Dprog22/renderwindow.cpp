@@ -16,7 +16,14 @@
 
 #include "xyz.h"
 
+
+//#include "beziercurve.h"
+
+//#include "trophy.h"
+
 #include "trianglesurface.h"
+#include "lasmap.h"
+#include "octahedronball.h"
 #include "rollingball.h"
 
 #include "texture.h"
@@ -24,6 +31,8 @@
 #include <QVector3D>
 #include "pointlight.h"
 #include "quad.h"
+
+#include "modelobject.h"
 
 #include "bspline.h"
 
@@ -181,17 +190,20 @@ void RenderWindow::init()
     mObjects.push_back(ny = new XYZ());
     ny->setName("XYZ");
     ny->init();
-    mObjects.push_back(ny = new TriangleSurface("../3Dprog22/formE4.txt"));
+//    //mObjects.push_back(ny = new TextureTriangle());
+//    mObjects.push_back(ny = new TextureTriangle());
+//    ny->setName("Teset");
+//    ny->init();
+    mObjects.push_back(ny = new lasmap("../3Dprog22/namdal.txt")); //namdal, formE4
     ny->setName("form");
     ny->init();
-//    mObjects.push_back(ny = new RollingBall(3,mObjects[1]));
-//    mObjects.push_back(ny = new RollingBall(3,0,20,0,mObjects[1]));
-//    ny->setName("ball");
-//    ny->init();
-
-//    mObjects.push_back(ny = new bSpline(/*mObjects[2]*/));
-//    ny->setName("spline");
-//    ny->init();
+    mObjects.push_back(ny = new RollingBall(3,mObjects[1]));
+    ny->setName("ball");
+    ny->init();
+    mObjects.push_back(ny = new bSpline(mObjects[2]));
+    ny->setName("spline");
+    ny->init();
+//    ny->mMatrix.translate(0.2f,  10.0f,  1.5f);
 
 
     //********************** Object Containers **********************
@@ -277,8 +289,8 @@ void RenderWindow::render()
 
     float deltaTime = elapsed_time.count();
     qDebug() << elapsed_time.count();
-//    mObjects[2]->move(deltaTime/1000);
-//    mObjects[3]->move(deltaTime/1000);
+    mObjects[2]->move(deltaTime/1000);
+    mObjects[3]->move(deltaTime/1000);
     /*
     //what shader to use
     glUseProgram(mShaderProgram[0]->getProgram() );
@@ -323,51 +335,47 @@ void RenderWindow::render()
     // draw call
     for(auto it=mObjects.begin(); it!=mObjects.end(); it++)
     {
-        textureRender(*it);
+        //it get shader
+        shaderInt = (*it)->getShader();
+
+        // get program
+        glUseProgram(mShaderProgram[shaderInt]->getProgram());
+
+        //switch shader type
+        switch(shaderInt){
+        case 0:
+            glUniformMatrix4fv( vMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
+            glUniformMatrix4fv( pMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
+            glUniformMatrix4fv( mMatrixUniform0, 1, GL_FALSE, (*it)->mMatrix.constData());
+            (*it)->draw();
+            break;
+        case 1:
+            glUniformMatrix4fv( vMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
+            glUniformMatrix4fv( pMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
+            glUniformMatrix4fv( mMatrixUniform1, 1, GL_FALSE, (*it)->mMatrix.constData());
+            glUniform1i(mTextureUniform, 1);
+            (*it)->draw();
+            break;
+        case 2:
+            glUniformMatrix4fv( vMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
+            glUniformMatrix4fv( pMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
+            glUniformMatrix4fv( mMatrixUniform2, 1, GL_FALSE, (*it)->mMatrix.constData());
+            checkForGLerrors();
+            //Additional parameters for light shader:
+            glUniform3f(mLightPositionUniform, mLight->mMatrix.column(3).x(), mLight->mMatrix.column(3).y(),
+                        mLight->mMatrix.column(3).z());
+            glUniform3f(mCameraPositionUniform, mCurrentCamera->mPosition.x(), mCurrentCamera->mPosition.y(), mCurrentCamera->mPosition.z());
+            glUniform3f(mLightColorUniform, mLight->mLightColor.x(), mLight->mLightColor.y(), mLight->mLightColor.z());
+            glUniform1f(mSpecularStrengthUniform, mLight->mSpecularStrength);
+            //Texture
+            glUniform1i(mTextureUniform2, 1);
+            (*it)->draw();
+            break;
+
+        }
+
+
     }//*/
-
-    //  Task 3.1, one ball placed interactively
-    if(mTask31){
-        if(ball == nullptr){
-            bdt = deltaTime;
-            ball = new RollingBall(3,bX,20,bZ,mObjects[1]);
-            ball->setName("ball");
-            ball->init();
-        }
-        textureRender(ball);
-        ball->move((deltaTime-bdt)/1000);
-    }
-    else{
-        if(ball != nullptr){
-            delete ball;
-            ball = nullptr;
-        }
-    }
-
-    //  Task 3.2, rain of balls
-    if(mTask32){
-        if(mBalls.empty()){
-            rdt = deltaTime;
-            for(int i = 0; i<aBalls; i++){
-                mBalls.push_back(ny = new RollingBall(3,bX,20,bZ,mObjects[1]));
-                ny->setName("ball");
-                ny->init();
-            }
-        }
-        for(auto it=mBalls.begin(); it!=mBalls.end(); it++)
-        {
-            textureRender(*it);
-            (*it)->move((deltaTime-rdt)/1000);
-        }
-    }
-    else{
-        if(!mBalls.empty()){
-            for(int i = mBalls.size()-1; i>=0; i--){
-                delete mBalls[i];
-                mBalls.pop_back();
-            }
-        }
-    }
 
     //iob->draw();
 
@@ -415,47 +423,6 @@ void RenderWindow::setupPhongShader(int shaderIndex)
     mLightPowerUniform = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "lightPower" );
     mCameraPositionUniform = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "cameraPosition" );
     mTextureUniform2 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "textureSampler");
-}
-
-void RenderWindow::textureRender(VisualObject *vo)
-{
-    //it get shader
-    shaderInt = vo->getShader();
-
-    // get program
-    glUseProgram(mShaderProgram[shaderInt]->getProgram());
-
-    //switch shader type
-    switch(shaderInt){
-    case 0:
-        glUniformMatrix4fv( vMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
-        glUniformMatrix4fv( pMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
-        glUniformMatrix4fv( mMatrixUniform0, 1, GL_FALSE, vo->mMatrix.constData());
-        vo->draw();
-        break;
-    case 1:
-        glUniformMatrix4fv( vMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
-        glUniformMatrix4fv( pMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
-        glUniformMatrix4fv( mMatrixUniform1, 1, GL_FALSE, vo->mMatrix.constData());
-        glUniform1i(mTextureUniform, 1);
-        vo->draw();
-        break;
-    case 2:
-        glUniformMatrix4fv( vMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
-        glUniformMatrix4fv( pMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
-        glUniformMatrix4fv( mMatrixUniform2, 1, GL_FALSE, vo->mMatrix.constData());
-        checkForGLerrors();
-        //Additional parameters for light shader:
-        glUniform3f(mLightPositionUniform, mLight->mMatrix.column(3).x(), mLight->mMatrix.column(3).y(),
-                    mLight->mMatrix.column(3).z());
-        glUniform3f(mCameraPositionUniform, mCurrentCamera->mPosition.x(), mCurrentCamera->mPosition.y(), mCurrentCamera->mPosition.z());
-        glUniform3f(mLightColorUniform, mLight->mLightColor.x(), mLight->mLightColor.y(), mLight->mLightColor.z());
-        glUniform1f(mSpecularStrengthUniform, mLight->mSpecularStrength);
-        //Texture
-        glUniform1i(mTextureUniform2, 1);
-        vo->draw();
-        break;
-    }
 }
 
 void RenderWindow::setCameraSpeed(float value)
