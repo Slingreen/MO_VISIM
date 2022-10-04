@@ -41,6 +41,11 @@ public:
 
     //********************** UI interaction: **********************
     bool mRotate{true};     //Check if triangle should rotate
+    bool mTerrain{false};
+    bool mTask31{false};
+    bool mTask32{false};
+
+    float bX{0}, bZ{0};
 //    void toggleWireFrame(bool toggle);
 //    void toggleBackfaceCulling(bool toggle);
 
@@ -66,8 +71,13 @@ private:
     float dt{0};
     int old_t;
     std::chrono::time_point<std::chrono::system_clock> start;
+    float bdt{0}, rdt{0}; // ball sin delta time, og regn sin delta time
+
     //********************** Object stuff: **********************
     std::vector<VisualObject*> mObjects;
+    VisualObject* ball = nullptr;
+    std::vector<VisualObject*> mBalls;
+    int aBalls{5};                                          //(a)mount of Balls
     std::unordered_map<std::string, VisualObject*> mMap;
     //gsml::QuadTre<std::string, VisualObject*> mQuadTre;
 
@@ -123,6 +133,7 @@ private:
     Texture *mTexture[4]{nullptr}; //We can hold 4 textures
     Shader *mShaderProgram[4]{nullptr}; //We can hold 4 shaders
 
+    void textureRender(VisualObject *vo);
     //********************** Render stuff: **********************
 
 //    GLint  mPmatrixUniform;

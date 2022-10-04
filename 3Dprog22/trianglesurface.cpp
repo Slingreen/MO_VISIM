@@ -20,6 +20,7 @@ TriangleSurface::TriangleSurface(std::string filnavn) : VisualObject()
 {
    readFileI(filnavn);
    mMatrix.setToIdentity();
+   shaderType = 1;
 }
 
 TriangleSurface::~TriangleSurface()

@@ -86,12 +86,61 @@ void MainWindow::on_rotationButton_toggled(bool checked)
     if(checked)
     {
         mRenderWindow->mRotate = true;
-        ui->rotationButton->setText("Stop rotation");
+        ui->rotationButton->setText("Stop 2.6");
     }
     else
     {
         mRenderWindow->mRotate = false;
-        ui->rotationButton->setText("Start rotation");
+        ui->rotationButton->setText("Start 2.6");
+    }
+}
+
+void MainWindow::on_task31Button_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRenderWindow->mTask31 = true;
+        mRenderWindow->bX = ui->lineX->text().toFloat();
+        mRenderWindow->bZ = ui->lineZ->text().toFloat();
+        ui->task31Button->setText("Stop 3.1");
+//        float x = ui->lineX->text().toFloat();
+//        QString z = ui->lineZ->text();
+    }
+    else
+    {
+        mRenderWindow->mTask31 = false;
+        ui->task31Button->setText("Start 3.1");
+    }
+}
+
+void MainWindow::on_task32Button_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRenderWindow->mTask32 = true;
+        ui->task32Button->setText("Stop 3.2/3.3");
+
+    }
+    else
+    {
+        mRenderWindow->mTask32 = false;
+        ui->task32Button->setText("Start 3.2/3.3");
+    }
+}
+
+void MainWindow::on_PointCloudButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRenderWindow->mTerrain = false;
+    }
+}
+
+void MainWindow::on_TerrengButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRenderWindow->mTerrain = true;
     }
 }
 
