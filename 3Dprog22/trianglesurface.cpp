@@ -217,7 +217,7 @@ void TriangleSurface::draw()
         // GL_FALSE for QMatrix4x4
 //        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
-        glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0));
+        glDrawElements(GL_LINES, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0));
         writeFileI("test.txt");
 }
 

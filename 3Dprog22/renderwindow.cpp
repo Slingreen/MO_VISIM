@@ -18,6 +18,7 @@
 
 #include "trianglesurface.h"
 #include "lasmap.h"
+#include "pointcloud.h"
 #include "octahedronball.h"
 
 #include "texture.h"
@@ -191,13 +192,12 @@ void RenderWindow::init()
     ny->setName("PointLight");
     ny->init();
     ny->mMatrix.translate(25.f,  20.0f,  10.f);
-    mObjects.push_back(Terreng = new TriangleSurface("../3Dprog22/formE4.txt"));
-    ny = Terreng;
-    ny->setName("form");
-    ny->init();
-    mObjects.push_back(ny = new lasmap("../3Dprog22/namdal.txt")); //namdal, formE4
-    ny->setName("pointCloud");
-    ny->init();
+    PointCloud = new Pointcloud("../3Dprog22/namdal.txt");
+    PointCloud->setName("pointCloud");
+    PointCloud->init();
+    Terreng = new lasmap("../3Dprog22/namdal.txt"); //namdal, formE4
+    Terreng->setName("surface");
+    Terreng->init();
 
 //    mObjects.push_back(ny = new RollingBall(3,mObjects[1]));
 //    mObjects.push_back(ny = new RollingBall(3,0,20,0,mObjects[1]));
@@ -343,11 +343,20 @@ void RenderWindow::render()
         textureRender(*it);
     }//*/
 
+    //  Task 2
+    if(mTerrain){
+        Surface = Terreng;
+        Surface->draw();
+    }else{
+        Surface = PointCloud;
+        Surface->draw();
+    }
+
     //  Task 3.1, one ball placed interactively
     if(mTask31){
         if(ball == nullptr){
             bdt = deltaTime;
-            ball = new RollingBall(3,bX,20,bZ,Terreng);
+            ball = new RollingBall(3,bX,100,bZ,Terreng);
             ball->setName("ball");
             ball->init();
         }
@@ -370,7 +379,7 @@ void RenderWindow::render()
             for(int i = 0; i<aBalls; i++){
                 fx = (std::rand()%(20));
                 fz = (std::rand()%(20));
-                mBalls.push_back(new RollingBall(3,fx,60,fz,Terreng));
+                mBalls.push_back(new RollingBall(3,fx,100,fz,Terreng));
                 mBalls[i]->setName("ball");
                 mBalls[i]->init();
             }

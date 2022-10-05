@@ -77,6 +77,8 @@ private:
     //********************** Object stuff: **********************
     std::vector<VisualObject*> mObjects;
     VisualObject* Terreng = nullptr;
+    VisualObject* PointCloud = nullptr;
+    VisualObject* Surface = nullptr;
     VisualObject* ball = nullptr;
     std::vector<RollingBall*> mBalls;
     std::vector<VisualObject*> mSplines;

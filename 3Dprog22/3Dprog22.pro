@@ -16,6 +16,7 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     modelobject.cpp \
     octahedronball.cpp \
+    pointcloud.cpp \
     pointlight.cpp \
     points.cpp \
     quad.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     mainwindow.h \
     modelobject.h \
     octahedronball.h \
+    pointcloud.h \
     pointlight.h \
     points.h \
     quad.h \
