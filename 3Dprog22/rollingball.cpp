@@ -132,9 +132,9 @@ void RollingBall::move(float dt)
             }
             else{
                 freeFalling =false;
-                    if (dt>=ti && loggedPoint.size()<5){
+                    if (dt>=tm && loggedPoint.size()<=5){
                         loggedPoint.push_back(QVector3D(getPosition3D()));
-                        ti+=dt;
+                        tm+=ti;
                     }
                 // beregn akselerasjonsvektor = ligning (7)
                 a = {n.x()*n.y(),n.y()*n.y()-1 ,n.z()*n.y()};
@@ -163,7 +163,7 @@ void RollingBall::move(float dt)
                 v_0=v_0-2*(v_0*n)*n;
                 landed=true;
                 v_0.setY(y);
-                ti+=dt;
+                tm=dt+ti;
             }
 
             if ( i != old_index)
@@ -221,8 +221,18 @@ void RollingBall::move(float dt)
     //float temp = p.y();
 
     //mPosition.translate(v_0.x(), y, v_0.z());
+
     mPosition.translate(v_0);
     mMatrix = mPosition * mRotation * mScale;
+}
+
+bool RollingBall::splineCheck()
+{
+    if(loggedPoint.size()==5 && !pointLogged){
+        pointLogged = true;
+        return true;
+    }
+    return false;
 }
 
 void RollingBall::UpdateNormal()
@@ -233,6 +243,11 @@ void RollingBall::UpdateNormal()
     float z = mMatrix.operator()(2,3);
 
     QVector3D point = triangle_surface->PointOnTriangle(x,y,z);
+}
+
+std::vector<QVector3D> RollingBall::givePoints()
+{
+    return loggedPoint;
 }
 
 void RollingBall::init(GLint matrixUniform)

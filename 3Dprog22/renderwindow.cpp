@@ -19,7 +19,6 @@
 #include "trianglesurface.h"
 #include "lasmap.h"
 #include "octahedronball.h"
-#include "rollingball.h"
 
 #include "texture.h"
 #include "texturetriangle.h"
@@ -162,10 +161,14 @@ void RenderWindow::init()
     mLogger->logText("Texture shader program id: " + std::to_string(mShaderProgram[1]->getProgram()) );
     mShaderProgram[2]= new Shader("../3Dprog22/PhongPointLight.vert", "../3Dprog22/PhongPointLight.frag");
     mLogger->logText("Texture shader program id: " + std::to_string(mShaderProgram[1]->getProgram()) );
+    mShaderProgram[3]= new Shader("../3Dprog22/PhongNoTexture.vert", "../3Dprog22/PhongNoTexture.frag");
+    mLogger->logText("Texture shader program id: " + std::to_string(mShaderProgram[3]->getProgram()) );
+
 
     setupPlainShader(0);
     setupTextureShader(1);
     setupPhongShader(2);
+    setupPhongShader2(3);
 
 
 
@@ -183,7 +186,13 @@ void RenderWindow::init()
     mObjects.push_back(ny = new XYZ());
     ny->setName("XYZ");
     ny->init();
-    mObjects.push_back(ny = new TriangleSurface("../3Dprog22/formE4.txt"));
+    mObjects.push_back(mLight = new PointLight());
+    ny = mLight;
+    ny->setName("PointLight");
+    ny->init();
+    ny->mMatrix.translate(25.f,  20.0f,  10.f);
+    mObjects.push_back(Terreng = new TriangleSurface("../3Dprog22/formE4.txt"));
+    ny = Terreng;
     ny->setName("form");
     ny->init();
     mObjects.push_back(ny = new lasmap("../3Dprog22/namdal.txt")); //namdal, formE4
@@ -281,7 +290,9 @@ void RenderWindow::render()
     //auto x = std::chrono::system_clock::now();
     //float y = x.count();
 
-    float deltaTime = elapsed_time.count();
+    dt++;
+//    float deltaTime = elapsed_time.count();
+    float deltaTime = dt/60;
     qDebug() << elapsed_time.count();
 //    mObjects[2]->move(deltaTime/1000);
 //    mObjects[3]->move(deltaTime/1000);
@@ -336,12 +347,12 @@ void RenderWindow::render()
     if(mTask31){
         if(ball == nullptr){
             bdt = deltaTime;
-            ball = new RollingBall(3,bX,20,bZ,mObjects[1]);
+            ball = new RollingBall(3,bX,20,bZ,Terreng);
             ball->setName("ball");
             ball->init();
         }
         textureRender(ball);
-        ball->move((deltaTime-bdt)/1000);
+        ball->move((deltaTime-bdt)/100);
     }
     else{
         if(ball != nullptr){
@@ -351,19 +362,33 @@ void RenderWindow::render()
     }
 
     //  Task 3.2, rain of balls
+    float fx{0};
+    float fz{0};
     if(mTask32){
         if(mBalls.empty()){
             rdt = deltaTime;
             for(int i = 0; i<aBalls; i++){
-                mBalls.push_back(ny = new RollingBall(3,bX,20,bZ,mObjects[1]));
-                ny->setName("ball");
-                ny->init();
+                fx = (std::rand()%(20));
+                fz = (std::rand()%(20));
+                mBalls.push_back(new RollingBall(3,fx,60,fz,Terreng));
+                mBalls[i]->setName("ball");
+                mBalls[i]->init();
             }
         }
         for(auto it=mBalls.begin(); it!=mBalls.end(); it++)
         {
             textureRender(*it);
-            (*it)->move((deltaTime-rdt)/1000);
+            (*it)->move((deltaTime-rdt)/100);
+            if((*it)->splineCheck()){
+                mSplines.push_back(ny = new bSpline((*it)->givePoints()));
+                ny->setName("XYZ");
+                ny->init();
+            }
+
+        }
+        for(auto it=mSplines.begin(); it!=mSplines.end(); it++)
+        {
+            textureRender(*it);
         }
     }
     else{
@@ -371,6 +396,10 @@ void RenderWindow::render()
             for(int i = mBalls.size()-1; i>=0; i--){
                 delete mBalls[i];
                 mBalls.pop_back();
+            }
+            for(int i = mSplines.size()-1; i>=0; i--){
+                delete mSplines[i];
+                mSplines.pop_back();
             }
         }
     }
@@ -423,6 +452,22 @@ void RenderWindow::setupPhongShader(int shaderIndex)
     mTextureUniform2 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "textureSampler");
 }
 
+void RenderWindow::setupPhongShader2(int shaderIndex)
+{
+    mMatrixUniform3 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "mMatrix" );
+    vMatrixUniform3 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "vMatrix" );
+    pMatrixUniform3 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "pMatrix" );
+
+    mLightColorUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "lightColor" );
+    mObjectColorUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "objectColor" );
+    mAmbientLightStrengthUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "ambientStrengt" );
+    mLightPositionUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "lightPosition" );
+    mSpecularStrengthUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "specularStrength" );
+    mSpecularExponentUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "specularExponent" );
+    mLightPowerUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "lightPower" );
+    mCameraPositionUniform2 = glGetUniformLocation( mShaderProgram[shaderIndex]->getProgram(), "cameraPosition" );
+}
+
 void RenderWindow::textureRender(VisualObject *vo)
 {
     //it get shader
@@ -433,20 +478,20 @@ void RenderWindow::textureRender(VisualObject *vo)
 
     //switch shader type
     switch(shaderInt){
-    case 0:
+    case 0:                     //  Unshaded
         glUniformMatrix4fv( vMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
         glUniformMatrix4fv( pMatrixUniform0, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
         glUniformMatrix4fv( mMatrixUniform0, 1, GL_FALSE, vo->mMatrix.constData());
         vo->draw();
         break;
-    case 1:
+    case 1:                     //  Texutre
         glUniformMatrix4fv( vMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
         glUniformMatrix4fv( pMatrixUniform1, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
         glUniformMatrix4fv( mMatrixUniform1, 1, GL_FALSE, vo->mMatrix.constData());
         glUniform1i(mTextureUniform, 1);
         vo->draw();
         break;
-    case 2:
+    case 2:                     //  Texture phong shaded
         glUniformMatrix4fv( vMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
         glUniformMatrix4fv( pMatrixUniform2, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
         glUniformMatrix4fv( mMatrixUniform2, 1, GL_FALSE, vo->mMatrix.constData());
@@ -461,6 +506,20 @@ void RenderWindow::textureRender(VisualObject *vo)
         glUniform1i(mTextureUniform2, 1);
         vo->draw();
         break;
+    case 3:                     //  Un-textured phong shaded
+        glUniformMatrix4fv( vMatrixUniform3, 1, GL_FALSE, mCurrentCamera->mViewMatrix.constData());
+        glUniformMatrix4fv( pMatrixUniform3, 1, GL_FALSE, mCurrentCamera->mProjectionMatrix.constData());
+        glUniformMatrix4fv( mMatrixUniform3, 1, GL_FALSE, vo->mMatrix.constData());
+        checkForGLerrors();
+        //Additional parameters for light shader:
+        glUniform3f(mLightPositionUniform2, mLight->mMatrix.column(3).x(), mLight->mMatrix.column(3).y(),
+                    mLight->mMatrix.column(3).z());
+        glUniform3f(mCameraPositionUniform2, mCurrentCamera->mPosition.x(), mCurrentCamera->mPosition.y(), mCurrentCamera->mPosition.z());
+        glUniform3f(mLightColorUniform2, mLight->mLightColor.x(), mLight->mLightColor.y(), mLight->mLightColor.z());
+        glUniform1f(mSpecularStrengthUniform2, mLight->mSpecularStrength);
+        vo->draw();
+        break;
+
     }
 }
 

@@ -8,6 +8,7 @@ class bSpline : public VisualObject
 {
 public:
     bSpline(VisualObject *b);
+    bSpline(std::vector<QVector3D> p);
     ~bSpline() override;
 
     void init() override;

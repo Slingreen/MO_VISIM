@@ -51,3 +51,10 @@ void Vertex::GetXYZ(float (&x)[3]){
     for(int i = 0; i < 3; i++)
         x[i]=m_xyz[i];
 }
+
+void Vertex::SetColor(float r, float g, float b)
+{
+    m_normal[0] = r;
+    m_normal[1] = g;
+    m_normal[2] = b;
+}

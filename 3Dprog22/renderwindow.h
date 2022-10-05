@@ -15,8 +15,9 @@
 #include "camera.h"
 #include "Input.h"
 #include "underlag.h"
+#include <random>
 
-
+#include "rollingball.h"
 
 
 class QOpenGLContext;
@@ -75,8 +76,10 @@ private:
 
     //********************** Object stuff: **********************
     std::vector<VisualObject*> mObjects;
+    VisualObject* Terreng = nullptr;
     VisualObject* ball = nullptr;
-    std::vector<VisualObject*> mBalls;
+    std::vector<RollingBall*> mBalls;
+    std::vector<VisualObject*> mSplines;
     int aBalls{5};                                          //(a)mount of Balls
     std::unordered_map<std::string, VisualObject*> mMap;
     //gsml::QuadTre<std::string, VisualObject*> mQuadTre;
@@ -128,6 +131,20 @@ private:
         GLint mSpecularExponentUniform{-1};
         GLint mLightPowerUniform{-1};
         GLint mTextureUniform2{-1};
+
+    void setupPhongShader2(int shaderIndex);
+        GLint mMatrixUniform3{-1};
+        GLint vMatrixUniform3{-1};
+        GLint pMatrixUniform3{-1};
+
+        GLint mLightColorUniform2{-1};
+        GLint mObjectColorUniform2{-1};
+        GLint mAmbientLightStrengthUniform2{-1};
+        GLint mLightPositionUniform2{-1};
+        GLint mCameraPositionUniform2{-1};
+        GLint mSpecularStrengthUniform2{-1};
+        GLint mSpecularExponentUniform2{-1};
+        GLint mLightPowerUniform2{-1};
 
     //Shader *mShaderProgram{nullptr};    //holds pointer the GLSL shader program
     Texture *mTexture[4]{nullptr}; //We can hold 4 textures

@@ -17,6 +17,8 @@ public:
     void init() override;
     void draw() override;
     void move(float dt) override;
+    bool splineCheck();
+    std::vector<QVector3D> givePoints();
 //    void setSurface(VisualObject* surface) { triangle_surface = surface; }
 protected:
     VisualObject* triangle_surface{nullptr};
@@ -38,7 +40,9 @@ private:
     bool freeFalling{true};
     bool landed{false};
 
-    float ti{0.001f};
+    float ti{0.02f};   //  tids intervall
+    float tm{0};        //  tids måling
     std::vector<QVector3D> loggedPoint;
+    bool pointLogged{false};
 };
 #endif // ROLLINGBALL_H

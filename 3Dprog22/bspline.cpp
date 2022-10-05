@@ -20,6 +20,24 @@ bSpline::bSpline(VisualObject *b)
     }
 }
 
+bSpline::bSpline(std::vector<QVector3D> p)
+{
+    for(int i = 0; i < p.size(); i++){
+        c.push_back(p[i]);
+    }
+
+    QVector3D a;
+    // hvis t[] har t+1 like verdier i starten og slutten
+    // får da siste 0 verdi posisjon lik d+1-1, siden array starter på 0
+    // i likhet får første største verdi posisjon lik:
+    // n+d+1-d-1=n
+    for(float tx = t[d]; tx < t[n]; tx+= 0.1f)
+    {
+      a = evaluateBSpline(tx);
+      mVertices.push_back(Vertex{a.x(),a.y(),a.z(),1-tx/t[n],tx/t[n],0,});
+    }
+}
+
 bSpline::~bSpline()
 {
 
