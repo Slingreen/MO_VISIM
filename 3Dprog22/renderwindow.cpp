@@ -193,6 +193,7 @@ void RenderWindow::init()
     ny->init();
     ny->mMatrix.translate(25.f,  20.0f,  10.f);
     PointCloud = new Pointcloud("../3Dprog22/namdal.txt");
+//    PointCloud = new TriangleSurface();
     PointCloud->setName("pointCloud");
     PointCloud->init();
     Terreng = new lasmap("../3Dprog22/namdal.txt"); //namdal, formE4
@@ -290,6 +291,8 @@ void RenderWindow::render()
     //auto x = std::chrono::system_clock::now();
     //float y = x.count();
 
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     dt++;
 //    float deltaTime = elapsed_time.count();
     float deltaTime = dt/60;
@@ -357,12 +360,12 @@ void RenderWindow::render()
     if(mTask31){
         if(ball == nullptr){
             bdt = deltaTime;
-            ball = new RollingBall(3,bX,100,bZ,Terreng);
+            ball = new RollingBall(3,bX,40,bZ,Terreng);
             ball->setName("ball");
             ball->init();
         }
         textureRender(ball);
-        ball->move((deltaTime-bdt)/100);
+        ball->move((deltaTime-bdt)/1000);
     }
     else{
         if(ball != nullptr){
@@ -378,9 +381,9 @@ void RenderWindow::render()
         if(mBalls.empty()){
             rdt = deltaTime;
             for(int i = 0; i<aBalls; i++){
-                fx = (std::rand()%(20));
-                fz = (std::rand()%(20));
-                mBalls.push_back(new RollingBall(3,fx,100,fz,Terreng));
+                fx = (std::rand()%(35));
+                fz = (std::rand()%(35));
+                mBalls.push_back(new RollingBall(3,fx,40,fz,Terreng));
                 mBalls[i]->setName("ball");
                 mBalls[i]->init();
             }
@@ -388,7 +391,7 @@ void RenderWindow::render()
         for(auto it=mBalls.begin(); it!=mBalls.end(); it++)
         {
             textureRender(*it);
-            (*it)->move((deltaTime-rdt)/100);
+            (*it)->move((deltaTime-rdt)/1000);
             if((*it)->splineCheck()){
                 mSplines.push_back(ny = new bSpline((*it)->givePoints()));
                 ny->setName("XYZ");

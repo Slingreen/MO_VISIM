@@ -21,7 +21,7 @@ RollingBall::RollingBall(int n, VisualObject *surface): OctahedronBall (n)
     mScale.setToIdentity();
     mMatrix.setToIdentity();
     mPosition.translate(p);
-    mScale.scale(0.5,0.5,0.5);
+    mScale.scale(r,r,r);
     mMatrix = mPosition * mRotation * mScale;
 
 }
@@ -36,7 +36,7 @@ RollingBall::RollingBall(int n, float x, float y, float z, VisualObject *surface
     mScale.setToIdentity();
     mMatrix.setToIdentity();
     mPosition.translate(p);
-    mScale.scale(0.5,0.5,0.5);
+    mScale.scale(r,r,r);
     mMatrix = mPosition * mRotation * mScale;
     shaderType = 0;
 }
@@ -127,8 +127,6 @@ void RollingBall::move(float dt)
                 // Oppdaterer hastighet og posisjon
                 p = p + v_0*dt+(1/2)*a*(dt*dt);
                 v_0=v_0+a*dt;
-
-
             }
             else{
                 freeFalling =false;
@@ -141,11 +139,11 @@ void RollingBall::move(float dt)
                 a*g;
 
                 // beregner friksjon
-                float mu{0};
+                float mu{0};/*
                 if (i == 2)
-                    mu = 0.5;
+                    mu = 0;
                 else
-                    mu = 0.272;
+                    mu = 0.272;*/
                 Vec3 fric = {n.x()*n.y(),n.y()*n.y()-1 ,n.z()*n.y()};
                 fric *= mu;
                 a -= fric;
@@ -154,8 +152,49 @@ void RollingBall::move(float dt)
                 v_0=v_0+a*dt;
 
                 v_0.setY(y);
-            }
+                if ( i != old_index)
+                {
+                    // Ballen har rullet over pa nytt triangel
+                    // Beregner normalen til kollisjons planet ,
+                    // se ligning ( 9 )
+                    Vec3 px;/*
+                    Vec3 oldNtest = old_normal;
+                    Vec3 nTest = n;*/
+                    if (Vec3(old_normal+n).length()<0)
+                        px = (old_normal + n)/(Vec3(old_normal+n).length()*-1);
+                    else
+                        px = (old_normal + n)/(Vec3(old_normal+n).length());
+    //                px.normalize();
+                    // Korrigere posisjon oppover i normalens retning
+                    //Vec3 ytest = (p-vec1)*px;
 
+
+
+
+    //                p.setY(p.y()+px.y()*0.5);
+    //                Vec3 ds = px*(v_0*px);
+    //                mPosition.translate(-ds);
+    //                Vec3 yk = (p-vec1)*n;
+    //                Vec3 yn = n*(yk*n);
+    //                float d = yn.length()-r;
+    //                mPosition.translate(0, n.y()*d,0);
+    //                p.setY(p.y()+d);
+                    // Oppdater hastighetsvektoren , se ligning ( 8 )
+                    v_0=v_0-2*(v_0*px)*px;
+                    Vec3 FartsMol = v_0;
+                    int fakestuff = 0;
+    //                v_0.setY(-v_0.y());
+                    // Oppdatere posisjon i retning den nye
+                    // hastighetsvektoren5
+                    /*Vec3 dsn = px*(v_0*px);
+                    mPosition.translate((dsn.x()+d), 0,(dsn.z()+d));*/
+    //                mPosition.translate(v_0.x()*d,0,v_0.z()*d);
+                    //p = v_0*dt+(1/2)*a*(dt*dt);
+                    //y =(u * v0.GetY() + v * v1.GetY() + w * v2.GetY());
+
+                    v_0.setY(y);
+                }
+            }
             if(!freeFalling && !landed){
 //                Vec3 crash{(Vec3(-1,0,-1) + n)/(Vec3(Vec3(0,-1,0)+n).length())};
 //                crash.normalize();
@@ -166,44 +205,7 @@ void RollingBall::move(float dt)
                 tm=dt+ti;
             }
 
-            if ( i != old_index)
-            {
-                // Ballen har rullet over pa nytt triangel
-                // Beregner normalen til kollisjons planet ,
-                // se ligning ( 9 )
-                Vec3 px;
-                if (Vec3(old_normal+n).length()<0)
-                    px = (old_normal + n)/(Vec3(old_normal+n).length()*-1);
-                else
-                    px = (old_normal + n)/(Vec3(old_normal+n).length());
-                px.normalize();
-                // Korrigere posisjon oppover i normalens retning
-                //Vec3 ytest = (p-vec1)*px;
 
-
-
-
-//                p.setY(p.y()+px.y()*0.5);
-//                Vec3 ds = px*(v_0*px);
-//                mPosition.translate(-ds);
-//                Vec3 yk = (p-vec1)*n;
-//                Vec3 yn = n*(yk*n);
-//                float d = yn.length()-r;
-//                mPosition.translate(0, n.y()*d,0);
-//                p.setY(p.y()+d);
-                // Oppdater hastighetsvektoren , se ligning ( 8 )
-                v_0=v_0-2*(v_0*px)*px;
-//                v_0.setY(-v_0.y());
-                // Oppdatere posisjon i retning den nye
-                // hastighetsvektoren5
-                /*Vec3 dsn = px*(v_0*px);
-                mPosition.translate((dsn.x()+d), 0,(dsn.z()+d));*/
-//                mPosition.translate(v_0.x()*d,0,v_0.z()*d);
-                //p = v_0*dt+(1/2)*a*(dt*dt);
-                //y =(u * v0.GetY() + v * v1.GetY() + w * v2.GetY());
-
-                v_0.setY(y);
-            }
             // Oppdater gammel normal og indeks
             old_normal = n;
             old_index = i;

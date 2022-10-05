@@ -1,6 +1,7 @@
 #include "trianglesurface.h"
 #include <fstream>
 #include <ostream>
+#include <random>
 
 TriangleSurface::TriangleSurface() : VisualObject()
 {
@@ -11,7 +12,29 @@ TriangleSurface::TriangleSurface() : VisualObject()
 //  Vertex v3{0.0,0.0,0.0, 0,0,1};    mVertices.push_back(v3);
 //  Vertex v4{0.5,0.5,0.0, 0,1,0};    mVertices.push_back(v4);
 //  Vertex v5{0.0,0.5,0.0, 1,0,0};    mVertices.push_back(v5);
+//    int sizeTest = 10;
+//    for(int i = 0; i<sizeTest; i++){
+//        for(int j =0; j<sizeTest; j++){
+//            float jy = j;
+//            float ix = i;
+//            float tt = 0;/*
+//            if((j+i)%3==0)
+//                tt = 3.f;*/
+//            mVertices.push_back(Vertex {ix,tt, jy, jy/sizeTest,0,ix/sizeTest});
+//        }
+//    }
+//    for(float i = 0; i<sizeTest-1; i++){
+//        for(float j =0; j<sizeTest-1; j++){
+//            mIndices.push_back(j+(i+1)*sizeTest);
+//            mIndices.push_back(j+i*sizeTest);
+//            mIndices.push_back((j+1) + i*sizeTest);
 
+//            mIndices.push_back((j+1) + i*sizeTest);
+//            mIndices.push_back((j+1) + (i+1)*sizeTest);
+//            mIndices.push_back(j+(i+1)*sizeTest);
+
+//        }
+//    }
   mMatrix.setToIdentity();
 }
 
@@ -101,7 +124,9 @@ void TriangleSurface::writeFileI(std::string filnavn) {
         n = mIndices.size();
         ut << n << std::endl;
         for (int i=0; i<n; i++) {
-             ut << mIndices.at(i) << std::endl;
+            if(i%3==0)
+               ut << std::endl;
+             ut << mIndices.at(i) << " ";
         }
         ut.close();
     }
@@ -215,10 +240,14 @@ void TriangleSurface::draw()
     initializeOpenGLFunctions();
         glBindVertexArray( mVAO );
         // GL_FALSE for QMatrix4x4
-//        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
+        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
-        glDrawElements(GL_LINES, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0));
-        writeFileI("test.txt");
+        glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0));
+
+//        glDrawArrays(GL_POINTS,
+//                        0,
+//                        mVertices.size());
+        writeFileI("test3.txt");
 }
 
 QVector3D TriangleSurface::PointOnTriangle(float x, float y, float z)

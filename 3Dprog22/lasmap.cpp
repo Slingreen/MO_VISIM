@@ -7,14 +7,14 @@ lasmap::lasmap()
 
 lasmap::lasmap(std::string filnavn)
 {
-    readFile(filnavn);/*
-    mMatrix.setToIdentity();
+    readFile(filnavn);
+    mMatrix.setToIdentity();/*
     mPosition.setToIdentity();
     mRotation.setToIdentity();
     mScale.setToIdentity();
     mScale.scale(sizeincrease,sizeincrease,sizeincrease);
     mMatrix  = mPosition * mRotation * mScale;*/
-    mMatrix.scale(sizeincrease,sizeincrease,sizeincrease);
+    //mMatrix.scale(sizeincrease,sizeincrease,sizeincrease);
     shaderType = 3;
 }
 
@@ -225,12 +225,14 @@ void lasmap::readFile(std::string filnavn)
 
             float g = Surface.size();
 
-            mIndices.push_back(A);
+
             mIndices.push_back(B);
+            mIndices.push_back(A);
             mIndices.push_back(C);
 
-            mIndices.push_back(C);
+
             mIndices.push_back(B);
+            mIndices.push_back(C);
             mIndices.push_back(D);
 
             /*switch (square){
@@ -356,7 +358,7 @@ void lasmap::readFile(std::string filnavn)
         //mIndices.push_back(pB);
         //mIndices.push_back(pC);
     //}/**/
-    writeFile("newPoints.txt");/**/
+    //writeFile("newPoints.txt");/**/
 }
 
 void lasmap::Reduce_Points(float x, float y, float zMin, float e, float xMin, float yMin, float xMax){

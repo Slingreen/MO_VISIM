@@ -15,7 +15,7 @@ public:
     void draw() override;
 protected:
     std::vector <QVector3D> Points;
-    const int sizeincrease{2};
+    const int sizeincrease{1};
 private:
     void readFile(std::string filnavn);
     void Reduce_Points(float x, float y, float zMin, float e, float xMin, float yMin, float xMax);

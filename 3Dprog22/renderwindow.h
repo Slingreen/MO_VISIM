@@ -82,7 +82,7 @@ private:
     VisualObject* ball = nullptr;
     std::vector<RollingBall*> mBalls;
     std::vector<VisualObject*> mSplines;
-    int aBalls{5};                                          //(a)mount of Balls
+    int aBalls{20};                                          //(a)mount of Balls
     std::unordered_map<std::string, VisualObject*> mMap;
     //gsml::QuadTre<std::string, VisualObject*> mQuadTre;
 

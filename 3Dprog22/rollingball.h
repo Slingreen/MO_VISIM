@@ -34,13 +34,13 @@ private:
     Vec3 p{0,15,0};
     float y{p.y()};
     float oy{p.y()};
-    float r{0.5};
+    float r{0.1};
 
     bool onTriangle{false};
     bool freeFalling{true};
     bool landed{false};
 
-    float ti{0.02f};   //  tids intervall
+    float ti{0.002f};   //  tids intervall
     float tm{0};        //  tids måling
     std::vector<QVector3D> loggedPoint;
     bool pointLogged{false};
