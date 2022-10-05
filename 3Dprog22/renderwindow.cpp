@@ -294,6 +294,7 @@ void RenderWindow::render()
 //    float deltaTime = elapsed_time.count();
     float deltaTime = dt/60;
     qDebug() << elapsed_time.count();
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 //    mObjects[2]->move(deltaTime/1000);
 //    mObjects[3]->move(deltaTime/1000);
     /*
