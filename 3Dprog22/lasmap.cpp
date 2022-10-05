@@ -162,9 +162,9 @@ void lasmap::readFile(std::string filnavn)
 
     for (float yy = yMin; yy < yMax; yy += ekvidistanse){
         for (float xx = xMin; xx < xMax; xx += ekvidistanse){
-            float last_height{0};
-            int loopnr{1};
-            Reduce_Points(xx, yy, zMin, ekvidistanse, &last_height, xMin, yMin, &loopnr, xMax);
+            lasth = 0;
+            loop_counter = 1;
+            Reduce_Points(xx, yy, zMin, ekvidistanse, xMin, yMin, xMax);
         }
     }
 /*
@@ -225,7 +225,15 @@ void lasmap::readFile(std::string filnavn)
 
             float g = Surface.size();
 
-            switch (square){
+            mIndices.push_back(A);
+            mIndices.push_back(B);
+            mIndices.push_back(C);
+
+            mIndices.push_back(C);
+            mIndices.push_back(B);
+            mIndices.push_back(D);
+
+            /*switch (square){
             case 1:
                 Surface.push_back({ A, B, C, id + 1, -1, -1});
                 id++;
@@ -301,7 +309,7 @@ void lasmap::readFile(std::string filnavn)
                 break;
             case 10:
                 break;
-            }
+            }*/
         }
         row++;
     }
@@ -313,8 +321,8 @@ void lasmap::readFile(std::string filnavn)
         int count{0};
         float y;
 
-        for (int j = 0; j < Surface.size(); j++){
-            if (Surface[j][0] == i || Surface[j][1] == i || Surface[j][2] == i){
+        for (int j = 0; j < mIndices.size(); j++){
+            if (mIndices[j] == i || mIndices[j] == i || mIndices[j] == i){
                 xsum += new_Points[i].x();
                 zsum += new_Points[i].z();
                 count++;
@@ -331,7 +339,7 @@ void lasmap::readFile(std::string filnavn)
     }
 
 
-    for (int i = 0; i < Surface.size(); i++){
+    /*for (int i = 0; i < Surface.size(); i++){
         int pA = Surface[i][0];
         int pB = Surface[i][1];
         int pC = Surface[i][2];
@@ -344,13 +352,14 @@ void lasmap::readFile(std::string filnavn)
         mVertices[B] = p1;
         mVertices[C] = p2;
 */
-        mIndices.push_back(pA);
-        mIndices.push_back(pB);
-        mIndices.push_back(pC);
-    }/**/
+        //mIndices.push_back(pA);
+        //mIndices.push_back(pB);
+        //mIndices.push_back(pC);
+    //}/**/
+    writeFile("newPoints.txt");/**/
 }
 
-void lasmap::Reduce_Points(float x, float y, float zMin, float e, float* lasth, float xMin, float yMin, int* loop, float xMax){
+void lasmap::Reduce_Points(float x, float y, float zMin, float e, float xMin, float yMin, float xMax){
     int count{0};
     float sum{0};
 
@@ -362,18 +371,18 @@ void lasmap::Reduce_Points(float x, float y, float zMin, float e, float* lasth, 
     }
 
     int l = new_Points.size();
-    *lasth += sum/count;
+    lasth += sum/count;
+
     if (count >= 1){
-        int read_loop = *loop;
-        new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin)); //fix for y values
+        new_Points.push_back(QVector3D(x - xMin, lasth/loop_counter, y - yMin)); //fix for y values
         if (x + e >= xMax){
-            new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin));
+            new_Points.push_back(QVector3D(x - xMin, lasth/loop_counter, y - yMin));
         }
         return;
     }//else if(count >= 1 && *loop )
 
     if (!(x + e >= xMax)){
-        Reduce_Points(x + e, y + e, zMin, e, lasth, xMin, yMin, loop++, xMax); //fix y values
+        Reduce_Points(x + e, y + e, zMin, e, xMin, yMin, xMax); //fix y values
     }else{
         QVector2D PrevPoint = QVector2D (Points[0].x(), Points[0].y());
         QVector2D Point = QVector2D (x, y);
