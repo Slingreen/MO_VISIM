@@ -20,6 +20,7 @@ TriangleSurface::TriangleSurface(std::string filnavn) : VisualObject()
 {
    readFileI(filnavn);
    mMatrix.setToIdentity();
+   shaderType = 3;
 }
 
 TriangleSurface::~TriangleSurface()
@@ -214,7 +215,7 @@ void TriangleSurface::draw()
     initializeOpenGLFunctions();
         glBindVertexArray( mVAO );
         // GL_FALSE for QMatrix4x4
-        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
+//        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
         //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
         glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0));
         writeFileI("test.txt");

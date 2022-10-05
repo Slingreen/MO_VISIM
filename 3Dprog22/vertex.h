@@ -20,6 +20,7 @@ public:
     float GetY();
     float GetZ();
     void GetXYZ(float (&x)[3]);
+    void SetColor(float r, float g, float b);
 };
 
 #endif // VERTEX_H

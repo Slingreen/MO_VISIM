@@ -64,6 +64,8 @@ FORMS += \
 
 DISTFILES += \
     Bitmap/Makefile \
+    PhongNoTexture.frag \
+    PhongNoTexture.vert \
     PhongPointLight.frag \
     PhongPointLight.vert \
     plainshader.frag \

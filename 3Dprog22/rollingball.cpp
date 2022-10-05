@@ -26,19 +26,20 @@ RollingBall::RollingBall(int n, VisualObject *surface): OctahedronBall (n)
 
 }
 
-//RollingBall::RollingBall(int n, VisualObject *surface, bSpline *s): OctahedronBall (n)
-//{
-//    triangle_surface = surface;
-//    spline = s;
-//    mPosition.setToIdentity();
-//    mRotation.setToIdentity();
-//    mScale.setToIdentity();
-//    mMatrix.setToIdentity();
-//    mPosition.translate(p);
-//    mScale.scale(0.5,0.5,0.5);
-//    mMatrix = mPosition * mRotation * mScale;
-
-//}
+RollingBall::RollingBall(int n, float x, float y, float z, VisualObject *surface): OctahedronBall (n)
+{
+    triangle_surface = surface;
+    p = Vec3(x,y,z);
+    y = oy = p.y();
+    mPosition.setToIdentity();
+    mRotation.setToIdentity();
+    mScale.setToIdentity();
+    mMatrix.setToIdentity();
+    mPosition.translate(p);
+    mScale.scale(0.5,0.5,0.5);
+    mMatrix = mPosition * mRotation * mScale;
+    shaderType = 0;
+}
 
 RollingBall::~RollingBall()
 {
@@ -118,12 +119,23 @@ void RollingBall::move(float dt)
             Vec3 vec2{v2.GetX(),v2.GetY(),v2.GetZ()};
             Vec3 n = QVector3D().crossProduct(vec1-vec0,vec2-vec0);
             n.normalize();
-
-            if(1==0){
+            y = (u * v0.GetY() + v * v1.GetY() + w * v2.GetY())-oy+0.5;
+            oy = (u * v0.GetY() + v * v1.GetY() + w * v2.GetY())+0.5;
+            if(getPosition3D().y()>oy){
                 a = {0,-1 ,0};
                 a*g;
+                // Oppdaterer hastighet og posisjon
+                p = p + v_0*dt+(1/2)*a*(dt*dt);
+                v_0=v_0+a*dt;
+
+
             }
             else{
+                freeFalling =false;
+                    if (dt>=tm && loggedPoint.size()<=5){
+                        loggedPoint.push_back(QVector3D(getPosition3D()));
+                        tm+=ti;
+                    }
                 // beregn akselerasjonsvektor = ligning (7)
                 a = {n.x()*n.y(),n.y()*n.y()-1 ,n.z()*n.y()};
                 a*g;
@@ -137,15 +149,23 @@ void RollingBall::move(float dt)
                 Vec3 fric = {n.x()*n.y(),n.y()*n.y()-1 ,n.z()*n.y()};
                 fric *= mu;
                 a -= fric;
+                // Oppdaterer hastighet og posisjon
+                p =p + v_0*dt+(1/2)*a*(dt*dt);
+                v_0=v_0+a*dt;
+
+                v_0.setY(y);
             }
 
+            if(!freeFalling && !landed){
+//                Vec3 crash{(Vec3(-1,0,-1) + n)/(Vec3(Vec3(0,-1,0)+n).length())};
+//                crash.normalize();
+//                v_0=v_0-2*(v_0*crash)*crash;
+                v_0=v_0-2*(v_0*n)*n;
+                landed=true;
+                v_0.setY(y);
+                tm=dt+ti;
+            }
 
-            // Oppdaterer hastighet og posisjon
-            p = v_0*dt+(1/2)*a*(dt*dt);
-            v_0=v_0+a*dt;
-
-            y = (u * v0.GetY() + v * v1.GetY() + w * v2.GetY())-oy+0.5;
-            oy = (u * v0.GetY() + v * v1.GetY() + w * v2.GetY())+0.5;
             if ( i != old_index)
             {
                 // Ballen har rullet over pa nytt triangel
@@ -181,6 +201,8 @@ void RollingBall::move(float dt)
 //                mPosition.translate(v_0.x()*d,0,v_0.z()*d);
                 //p = v_0*dt+(1/2)*a*(dt*dt);
                 //y =(u * v0.GetY() + v * v1.GetY() + w * v2.GetY());
+
+                v_0.setY(y);
             }
             // Oppdater gammel normal og indeks
             old_normal = n;
@@ -197,9 +219,20 @@ void RollingBall::move(float dt)
     //mPosition.setToIdentity();
     //p = p + v_0;
     //float temp = p.y();
-    mPosition.translate(v_0.x(), y, v_0.z());
-//    mPosition.translate(v_0);
+
+    //mPosition.translate(v_0.x(), y, v_0.z());
+
+    mPosition.translate(v_0);
     mMatrix = mPosition * mRotation * mScale;
+}
+
+bool RollingBall::splineCheck()
+{
+    if(loggedPoint.size()==5 && !pointLogged){
+        pointLogged = true;
+        return true;
+    }
+    return false;
 }
 
 void RollingBall::UpdateNormal()
@@ -210,6 +243,11 @@ void RollingBall::UpdateNormal()
     float z = mMatrix.operator()(2,3);
 
     QVector3D point = triangle_surface->PointOnTriangle(x,y,z);
+}
+
+std::vector<QVector3D> RollingBall::givePoints()
+{
+    return loggedPoint;
 }
 
 void RollingBall::init(GLint matrixUniform)

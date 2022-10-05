@@ -20,6 +20,12 @@ std::pair<float, float> VisualObject::getPosition2D()
     return std::pair<float,float>(col.x(),col.z());
 }
 
+QVector3D VisualObject::getPosition3D()
+{
+    auto col = mPosition.column(3);
+    return QVector3D(col.x(),col.y(),col.z());
+}
+
 void VisualObject::setName(std::string name)
 {
     navn = name;

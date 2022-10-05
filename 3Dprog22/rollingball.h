@@ -10,12 +10,15 @@ class RollingBall : public OctahedronBall
 public:
     RollingBall(int n);
     RollingBall(int n, VisualObject* surface);
+    RollingBall(int n, float x, float y, float z, VisualObject* surface);
 //    RollingBall(int n, VisualObject* surface, bSpline *s);
     ~RollingBall() override;
     void init(GLint matrixUniform) override;
     void init() override;
     void draw() override;
     void move(float dt) override;
+    bool splineCheck();
+    std::vector<QVector3D> givePoints();
 //    void setSurface(VisualObject* surface) { triangle_surface = surface; }
 protected:
     VisualObject* triangle_surface{nullptr};
@@ -29,10 +32,17 @@ private:
     Vec3 a;
     Vec3 v_0{0,0,0};
     Vec3 p{0,15,0};
-    float y{15};
-    float oy{15};
+    float y{p.y()};
+    float oy{p.y()};
     float r{0.5};
 
     bool onTriangle{false};
+    bool freeFalling{true};
+    bool landed{false};
+
+    float ti{0.02f};   //  tids intervall
+    float tm{0};        //  tids måling
+    std::vector<QVector3D> loggedPoint;
+    bool pointLogged{false};
 };
 #endif // ROLLINGBALL_H
