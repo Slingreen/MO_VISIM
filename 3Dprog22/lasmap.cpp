@@ -89,8 +89,20 @@ void lasmap::draw()
     // GL_FALSE for QMatrix4x4
     glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
-//    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0)); //GL_POINTS, GL_TRIANGLES
-    glDrawArrays(GL_TRIANGLES, 0, mVertices.size());
+
+    /*for (int i = 0; i < Surface.size(); i++){
+        int A = Surface[i][0];
+        int B = Surface[i][1];
+        int C = Surface[i][2];
+
+        mIndices.push_back(A);
+        mIndices.push_back(B);
+        mIndices.push_back(C);
+    }
+
+    glDrawElements(GL_POINTS, mIndices.size(), GL_UNSIGNED_INT, reinterpret_cast<const void*>(0)); //GL_POINTS, GL_TRIANGLES
+    /**/
+    glDrawArrays(GL_POINTS, 0, mVertices.size());
 }
 
 void lasmap::readFile(std::string filnavn)
@@ -296,15 +308,11 @@ void lasmap::Reduce_Points(float x, float y, float zMin, int e, float* lasth, fl
         *lasth += sum/count;
         int read_loop = *loop;
         new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin)); //fix for y values
-        *loop = 1;
         *lasth = 0;
+        *loop = 1;
     }else if (!(x + e >= xMax)){
         Reduce_Points(x + e, y + e, zMin, e, lasth, xMin, yMin, loop++, xMax); //fix y values
-    }else{
-        *lasth += sum/count;
-        int read_loop = *loop;
-        new_Points.push_back(QVector3D(x - xMin, *lasth/read_loop, y - yMin)); //fix y values
-        *loop = 1;
-        *lasth = 0;
-    }
+    }/*else{
+        new_Points.push_back(QVector3D(x - xMin, 0, y - yMin)); //fix y values
+    }*/
 }
