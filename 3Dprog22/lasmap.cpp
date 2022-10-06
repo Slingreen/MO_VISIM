@@ -172,26 +172,26 @@ void lasmap::readFile(std::string filnavn)
 
 //    int l = Points.size();
 //    int k = new_Points.size();
-//    int id{0};
-//    int square{1};
-//    int maxsquares{0};
+    int id{0};
+    int square{1};
+    int maxsquares{0};
 //    int maxrows{0};
-//    for (int i = 0; i < new_Points.size(); i++){
-//        if (new_Points[i].x() == 0){
-//            maxsquares++;
-//        }
+    for (int i = 0; i < new_Points.size(); i++){
+       if (new_Points[i].x() == 0){
+            maxsquares++;
+        }
 //        if (new_Points[i].z() == 0){
 //            maxrows++;
 //        }
-//    }
-//    int maxTriangles = (maxsquares - 1) * 2;
+    }
+    int maxTriangles = (maxsquares - 1) * 2;
 //    maxrows--;
 //    int row{1};
-//    const int doubleE = ekvidistanse + ekvidistanse + ekvidistanse;
+    const int doubleE = ekvidistanse + ekvidistanse + ekvidistanse;
     for (float dz = 0; (dz + ekvidistanse) < (yMax - yMin); dz += ekvidistanse){
         for (float dx = 0; (dx + ekvidistanse) < (xMax - xMin); dx += ekvidistanse){
             int A{0}, B{0}, C{0}, D{0};
-            //int NextC{0}, NextB{0};
+            int NextC{0}, NextB{0};
 
             for (int i = 0; i < new_Points.size(); i++){
 //                int ax = new_Points[i].x();
@@ -215,17 +215,17 @@ void lasmap::readFile(std::string filnavn)
                     C = i;
                 }else if (new_Points[i].x() == dx + ekvidistanse && new_Points[i].z() == dz + ekvidistanse){//dosen't trigger? triggers randomly
                     D = i;
-                }/*else if (new_Points[i].x() == dx && new_Points[i].z() == dz + doubleE){//dosen't trigger? triggers randomly
+                }else if (new_Points[i].x() == dx && new_Points[i].z() == dz + doubleE){//dosen't trigger? triggers randomly
                     NextC = i;
                 }else if (new_Points[i].x() == dx + doubleE && new_Points[i].z() == dz){//dosen't trigger? triggers randomly
                     NextB = i;
-                }*/
+                }
             }
 
 
             float g = Surface.size();
 
-
+/*
             mIndices.push_back(B);
             mIndices.push_back(A);
             mIndices.push_back(C);
@@ -234,51 +234,51 @@ void lasmap::readFile(std::string filnavn)
             mIndices.push_back(B);
             mIndices.push_back(C);
             mIndices.push_back(D);
-
-            /*switch (square){
+/**/
+            switch (square){
             case 1:
-                Surface.push_back({ A, B, C, id + 1, -1, -1});
+                Surface.push_back({ B, A, C, id + 1, -1, -1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, id + maxTriangles - 1, id - 1});
                 id++;
                 square++;
                 break;
             case 2:
-                Surface.push_back({ A, B, C, id + 1, id - 1, -1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, -1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, id + maxTriangles - 1, id - 1});
                 id++;
                 if (NextB == 0){
                     square++;
                 }
                 break;
             case 3:
-                Surface.push_back({ A, B, C, id + 1, id - 1, -1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, -1});
                 id++;
-                Surface.push_back({ C, B, D, -1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, -1, id + maxTriangles - 1, id - 1});
                 id++;
                 square++;
                 break;
             case 4:
-                Surface.push_back({ A, B, C, id + 1, -1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, -1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, id + maxTriangles - 1, id - 1});
                 id++;
                 square++;
                 break;
             case 5:
-                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, id + maxTriangles - 1, id - 1});
                 id++;
                 if (NextB == 0){
                     square++;
                 }
                 break;
             case 6:
-                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, -1, id + maxTriangles - 1, id - 1});
+                Surface.push_back({ B, C, D, -1, id + maxTriangles - 1, id - 1});
                 id++;
                 if (NextC == 0){
                     square++;
@@ -287,35 +287,52 @@ void lasmap::readFile(std::string filnavn)
                 }
                 break;
             case 7:
-                Surface.push_back({ A, B, C, id + 1, -1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, -1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, -1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, -1, id - 1});
                 id++;
                 square++;
                 break;
             case 8:
-                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, id + 1, -1, id - 1});
+                Surface.push_back({ B, C, D, id + 1, -1, id - 1});
                 id++;
                 if (NextB == 0){
                     square++;
                 }
                 break;
             case 9:
-                Surface.push_back({ A, B, C, id + 1, id - 1, id - maxTriangles - 1});
+                Surface.push_back({ B, A, C, id + 1, id - 1, id - maxTriangles - 1});
                 id++;
-                Surface.push_back({ C, B, D, -1, -1, id - 1});
+                Surface.push_back({ B, C, D, -1, -1, id - 1});
                 id++;
                 square++;
                 break;
             case 10:
                 break;
-            }*/
+            }/**/
         }
         //row++;
     }
 //    float g = Surface.size();
+    for (int i = 0; i < Surface.size(); i++){
+        int pA = Surface[i][0];
+        int pB = Surface[i][1];
+        int pC = Surface[i][2];
+/*
+        Vertex p(new_Points[A].x(), new_Points[A].y(), new_Points[A].z(), 1, 1, 1, 0, 1);
+        Vertex p1(new_Points[B].x(), new_Points[B].y(), new_Points[B].z(), 1, 1, 1, 0, 1);
+        Vertex p2(new_Points[C].x(), new_Points[C].y(), new_Points[C].z(), 1, 1, 1, 0, 1);
+
+        mVertices[A] = p;
+        mVertices[B] = p1;
+        mVertices[C] = p2;
+*/
+        mIndices.push_back(pA);
+        mIndices.push_back(pB);
+        mIndices.push_back(pC);
+    }/**/
 
     for (int i = 0; i < new_Points.size(); i++){
         float xsum{0};
@@ -341,23 +358,6 @@ void lasmap::readFile(std::string filnavn)
     }
 
 
-    /*for (int i = 0; i < Surface.size(); i++){
-        int pA = Surface[i][0];
-        int pB = Surface[i][1];
-        int pC = Surface[i][2];
-/*
-        Vertex p(new_Points[A].x(), new_Points[A].y(), new_Points[A].z(), 1, 1, 1, 0, 1);
-        Vertex p1(new_Points[B].x(), new_Points[B].y(), new_Points[B].z(), 1, 1, 1, 0, 1);
-        Vertex p2(new_Points[C].x(), new_Points[C].y(), new_Points[C].z(), 1, 1, 1, 0, 1);
-
-        mVertices[A] = p;
-        mVertices[B] = p1;
-        mVertices[C] = p2;
-*/
-        //mIndices.push_back(pA);
-        //mIndices.push_back(pB);
-        //mIndices.push_back(pC);
-    //}/**/
     //writeFile("newPoints.txt");/**/
 }
 
