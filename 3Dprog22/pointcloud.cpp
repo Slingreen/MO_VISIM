@@ -87,7 +87,6 @@ void Pointcloud::draw()
 {
     initializeOpenGLFunctions();
     glBindVertexArray( mVAO );
-    // GL_FALSE for QMatrix4x4
     glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, mMatrix.constData());
 
     glDrawArrays(GL_POINTS, 0, mVertices.size());
@@ -109,10 +108,6 @@ void Pointcloud::readFile(std::string filnavn)
              inn >> z;
 
              Points.push_back(QVector3D (x,y,z));
-
-             //vertex = Vertex(x - 659428, z - 59, y - 7153117, 1, 1, 1, 0, 1);
-
-             //mVertices.push_back(vertex);
         }
         inn >> n;
         inn.close();
@@ -138,7 +133,6 @@ void Pointcloud::readFile(std::string filnavn)
     }
 
     for (int i = 0; i < Points.size(); i++){
-        //Vertex r((Points[i].x() - xMin) * sizeincrease, (Points[i].z() - zMin)  * sizeincrease, (Points[i].y() - yMin)  * sizeincrease, 1, 1, 1, 0, 1);
         Vertex r(Points[i].x() - xMin, Points[i].z() - zMin, Points[i].y() - yMin, 1, 1, 1, 0, 1);
         mVertices.push_back(r);
     }
