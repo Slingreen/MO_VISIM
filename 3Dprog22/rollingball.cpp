@@ -166,31 +166,7 @@ void RollingBall::move(float dt)
                         px = (old_normal + n)/(Vec3(old_normal+n).length());
     //                px.normalize();
                     // Korrigere posisjon oppover i normalens retning
-                    //Vec3 ytest = (p-vec1)*px;
-
-
-
-
-    //                p.setY(p.y()+px.y()*0.5);
-    //                Vec3 ds = px*(v_0*px);
-    //                mPosition.translate(-ds);
-    //                Vec3 yk = (p-vec1)*n;
-    //                Vec3 yn = n*(yk*n);
-    //                float d = yn.length()-r;
-    //                mPosition.translate(0, n.y()*d,0);
-    //                p.setY(p.y()+d);
-                    // Oppdater hastighetsvektoren , se ligning ( 8 )
                     v_0=v_0-2*(v_0*px)*px;
-                    Vec3 FartsMol = v_0;
-                    int fakestuff = 0;
-    //                v_0.setY(-v_0.y());
-                    // Oppdatere posisjon i retning den nye
-                    // hastighetsvektoren5
-                    /*Vec3 dsn = px*(v_0*px);
-                    mPosition.translate((dsn.x()+d), 0,(dsn.z()+d));*/
-    //                mPosition.translate(v_0.x()*d,0,v_0.z()*d);
-                    //p = v_0*dt+(1/2)*a*(dt*dt);
-                    //y =(u * v0.GetY() + v * v1.GetY() + w * v2.GetY());
 
                     v_0.setY(y);
                 }
