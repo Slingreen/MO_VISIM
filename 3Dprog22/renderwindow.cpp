@@ -238,10 +238,10 @@ void RenderWindow::init()
     //********************** Camera Setup **********************
     mCurrentCamera = new Camera();
 
-    mCurrentCamera->setPosition(QVector3D(-15.0f, 40.f, 17.5f));
+    mCurrentCamera->setPosition(QVector3D(4.0f, 20.f, -5.0f));
     //mCurrentCamera->setPosition(QVector3D(0.0f, 0.0f, 0.0f));
     mCurrentCamera->pitch(40.f);
-    mCurrentCamera->yaw(90.f);
+    mCurrentCamera->yaw(180.f);
 
 
     glBindVertexArray(0);       //unbinds any VertexArray - good practice
