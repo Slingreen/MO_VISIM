@@ -45,6 +45,7 @@ RollingBall::~RollingBall()
 {
 
 }
+
 void RollingBall::move(float dt)
 {
     //std::vector<gsml::Vertex>& vertices = dynamic_cast<TriangleSurface*>(triangle_surface)->get_vertices();

@@ -285,7 +285,7 @@ void lasmap::readFile(std::string filnavn)
         float y;
 
         for (int j = 0; j < mIndices.size(); j++){
-            if (mIndices[j] == i || mIndices[j] == i || mIndices[j] == i){
+            if (mIndices[j] == i){
                 xsum += new_Points[i].x();
                 zsum += new_Points[i].z();
                 count++;
